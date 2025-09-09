@@ -1,116 +1,74 @@
-# Location-Recommendation-System-for-Starbucks-Expansion
-Built a Location Scoring System using ML models (XGBoost, Random Forest, Neural Networks) on 20+ datasets (Google Places, US Census, OpenStreetMap) with >10M data rows covering POIs, demographics, city boundaries and Isochrones, to predict store revenue potential and guide strategic expansion identifying both high-revenue and underserved potential locations.
+# Starbucks Location Recommendation System
 
-**Project Overview:**
+This project introduces a data-driven approach to help Starbucks identify high-potential locations for offline expansion. By building a location scoring system with machine learning, we can predict store revenue potential and guide strategic decisions, minimizing capital expenditure on underperforming locations.
 
-Starbucks, a global coffeehouse leader, operates thousands of locations worldwide. While some stores thrive, others underperform — often due to suboptimal site selection, leading to revenue loss and store closures. This project introduces a scalable, data-driven approach to help Starbucks identify high-potential locations for offline expansion and optimize capital expenditure.
+---
 
-**Problem Statement:**
+### **Project Overview**
 
-The Challenge:\
-How can Starbucks predict which new store locations are likely to succeed based on demographic, geographic, and competitive data?
+Starbucks operates thousands of locations, but not all are equally successful. The success or failure of a store is often linked to its location. The goal of this project is to develop a scalable, machine learning-based pipeline that predicts the likelihood of a new store's success based on a wide range of features.
 
-The Goal:\
-To develop a machine learning pipeline that:
+---
 
-Predicts the likelihood of store success using location-specific features\
-Supports smart, data-informed decisions for new store openings
+### **Methodology**
 
-**Data Overview:**
+Our pipeline uses a combination of data preparation, feature engineering, and advanced machine learning models to analyze and score potential locations.
 
-Dataset	Description:
+#### **Data and Feature Engineering**
 
-Points of Interest (POIs)	Restaurants, cafes, retail stores, hotels, supermarkets (Google Places API, OSM, Kaggle)\
-Demographics	Block-level population, income, age, gender (Census)\
-City Boundaries	Geometries of top 20 cities (OpenStreetMap)\
-Isochrones	Walking/driving coverage from Starbucks locations (Mapbox)
+We collected and integrated over 10 million rows of data from more than 20 datasets, including:
+* **Points of Interest (POIs):** Restaurants, retail stores, and hotels from sources like Google Places and OpenStreetMap (OSM).
+* **Demographics:** Block-level data on population, income, age, and gender from the US Census.
+* **Geospatial Data:** City boundaries and travel time (isochrones) from Mapbox and OSM.
 
-Data Preparation & Feature Engineering:
+We engineered features by:
+* Creating **buffer-based features** to count POIs within 500m and 1000m radii.
+* Generating **isochrone-based features** to count POIs reachable within 5- and 10-minute walking or driving times.
+* Extracting **demographic features** such as the percentage of households in different income brackets.
 
-1️⃣ Buffer-Based Features\
-Created 500m and 1000m buffers around each Starbucks\
-Counted POIs by category within each buffer\
-Example: number_of_fast_food_restaurants_within_1000m
+#### **Feature Selection & Modeling**
 
-2️⃣ Isochrone-Based Features\
-Generated 5- and 10-minute walking and driving isochrones\
-Counted POIs within each time-based reach\
-Example: number_of_supermarkets_within_10min_drive
+To ensure our models were efficient and accurate, we used the **Kruskal-Wallis test** and the **Boruta** algorithm for feature selection.
 
-3️⃣ Demographic Features\
-Income: % households in income brackets (e.g., $60k–$100k)\
-Age: % population by age group\
-Gender: Male and female distributions\
-Example: pct_households_60_100k
+For the core task of classifying a location as either high-potential (rating > 4 stars) or low-potential, we trained and evaluated several machine learning models. We focused on the **F1-score**, which is critical for balancing the risk of missing a good location (false negative) and opening a failing one (false positive).
 
-**Pre-Modeling & Feature Selection:**
+| Model | Class (0=Low, 1=High) | Precision | Recall | F1-score |
+| :--- | :--- | :--- | :--- | :--- |
+| **Logistic Regression** | **0** | **0.63** | **0.50** | **0.56** |
+| | **1** | **0.68** | **0.78** | **0.73** |
+| **XGBoost** | **0** | **0.59** | **0.54** | **0.57** |
+| | **1** | **0.68** | **0.72** | **0.70** |
 
-📊 Kruskal-Wallis Test
-Non-parametric test used to check if features significantly differentiate high- vs. low-rated stores.
+#### **Key Insights**
 
-🌲 Boruta (Tree-Based Models)
-Feature selection method that iteratively removes features less important than randomized "shadow features".
+We used **SHAP (SHapley Additive exPlanations)** to understand which features had the greatest impact on our model's predictions.
 
-🧠 Machine Learning Models
+| Feature | Impact (%) | Insight |
+| :--- | :--- | :--- |
+| **Distance to Nearest Starbucks** | **12.02%** | A strong negative impact, showing the importance of avoiding cannibalization of nearby, high-performing stores. |
+| **% Households earning $60k–$100k** | **9.22%** | A strong positive correlation with a store's success. |
+| **Presence of Fast Food Restaurants** | **8.61%** | A negative correlation, possibly due to brand dilution. |
+| **% Population aged 18–24** | **8.41%** | Young adults correlate positively with higher store ratings. |
+| **Supermarkets within 10-min drive**| **7.28%** | Indicates that locations with consistent foot traffic tend to perform better. |
 
-🎯 Classification Task\
-Target: Binary label – Store rating above or below 4 stars
+---
 
-Model	Train AUC	Test AUC\
-Logistic Regression	0.61	0.68\
-XGBoost	0.65	0.64
+### **Recommendations**
 
-**Metrics:**
+Based on our model's insights, we can provide actionable recommendations for strategic expansion:
+* **Open Stores In:**
+    * Neighborhoods with high-income households ($60k–$100k).
+    * Areas near supermarkets that attract consistent footfall.
+    * Micro-clusters of retail activity identified through geospatial clustering.
+* **Avoid Opening In:**
+    * Locations too close to high-performing Starbucks, which can cannibalize sales.
+    * Areas dense with fast-food restaurants or budget hotels, as these may signal a brand mismatch.
 
-Model	Class	Precision	Recall	F1-score\
-Logistic	0	0.63	0.50	0.56\
-1	0.68	0.78	0.73\
-XGBoost	0	0.59	0.54	0.57\
-1	0.68	0.72	0.70
+---
 
-📝 F1-score is crucial here:\
-False negatives → Missed opportunity\
-False positives → Capital loss on underperforming locations
+### **Future Work**
 
-💡 Key Insights from Feature Impact
-
-Feature	Impact (%)	Insight\
-Distance to Nearest Starbucks	-12.02%	- Avoid cannibalizing nearby high-rated stores\
-% Households earning $60k–$100k	-9.22% - Strong correlation with better performance\
-Presence of Fast Food Restaurants	-8.61%	- Negative impact due to brand dilution\
-% Population aged 18–24	-8.41%	- Young adults correlate with higher store ratings\
-Supermarkets within 10-min drive	-7.28%	- Attract consistent footfall\
-Budget Hotels Nearby	-5.54% -	May negatively affect perception and pricing
-
-**Post-Modeling Analysis:**
-
-🔍 SHAP Feature Importance\
-Explains feature impact on individual predictions and global trends
-
-🧭 Recursive Geospatial Clustering (DBSCAN + Haversine)\
-Reveals market areas, brand saturation, and expansion gaps\
-Helps define micro-clusters of retail activity\
-Identifies underrepresented neighborhoods with potential
-
-**Recommendations:**
-
-Open New Stores In:
-
-Locations near existing high-rated Starbucks\
-Neighborhoods with $60k–$100k income brackets\
-Areas near supermarkets and lightly saturated zones
-
-Avoid:
-
-Fast-food dense areas (negative brand positioning)\
-Budget hotel neighborhoods (price-conscious clientele)
-
-**Future Work:**
-
-Direction	- Description
-
-Real-Time Footfall	- Use mobility data to refine traffic estimates\
-Sentiment Analysis	- NLP on reviews to uncover quality/location feedback\
-Competitor Modeling	- Assess impact of premium/local coffee shops\
-Customer Feedback	- Incorporate service ratings and complaint patterns\
-Urban Market Dynamics	- Segment cities and adapt strategies per local behavior
+Future work will focus on refining the model's accuracy and practicality by:
+* Incorporating **real-time mobility data** to get more precise footfall estimates.
+* Performing **sentiment analysis** on customer reviews to get a deeper understanding of location-specific feedback.
+* Developing **competitor modeling** to assess the impact of other coffee shops.
