@@ -2,6 +2,9 @@
 
 This project introduces a data-driven approach to help Starbucks identify high-potential locations for offline expansion. By building a location scoring system with machine learning, we can predict store revenue potential and guide strategic decisions, minimizing capital expenditure on underperforming locations.
 
+👉 View the rendered project here:  
+https://amulya-jayanti.github.io/Location-Recommendation-System-for-Starbucks-Expansion/Starbucks_Offline_Expansion.html
+
 ---
 
 ### **Project Overview**
@@ -72,3 +75,4 @@ Future work will focus on refining the model's accuracy and practicality by:
 * Incorporating **real-time mobility data** to get more precise footfall estimates.
 * Performing **sentiment analysis** on customer reviews to get a deeper understanding of location-specific feedback.
 * Developing **competitor modeling** to assess the impact of other coffee shops.
+
